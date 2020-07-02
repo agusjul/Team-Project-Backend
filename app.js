@@ -5,6 +5,8 @@ var bodyParser = require('body-parser')
 
 const db = require ("./config/db");
 const User = require("./models/User");
+const Cart = require("./models/Cart");
+const Profile = require("./models/Profile");
 
 app.get("/", (req,res) => res.send ("respon berhasil"));
 
@@ -126,6 +128,111 @@ app.put("/produk/:id", async (req,res) =>{
         res.status(500).send("server error");
     }
 });
+
+
+// Cart Produk
+
+app.post("/cart", async (req,res) => {
+    try {
+        const { idProduk, namaProduk, hargaProduk, sizeProduk, jumlahProduk, gambarProduk} = req.body;
+        const newCart = new Cart({
+            idProduk,
+            namaProduk,
+            hargaProduk,
+            sizeProduk,
+            jumlahProduk,
+            gambarProduk
+        });
+
+        await newCart.save();
+
+        res.json(newCart);
+
+    } catch (err) {
+        console.error(err.massage);
+        res.status(500).send("server error");
+    }
+});
+
+app.get("/cart", async (req, res)=>{
+    try {
+        const getAllCart = await Cart.findAll({})
+
+        res.json(getAllCart)
+    } catch (err) {
+        console.error(err.massage);
+        res.status(500).send("server error");
+    }
+})
+
+app.delete("/cart/:id", async (req,res) =>{
+    try {
+        const ids = req.params.id;
+
+        const deleteCart = await Cart.destroy({
+            where : {idProduk:ids}
+        });
+
+        res.json("berhasil di hapus")
+    } catch (err) {
+        console.error(err.massage);
+        res.status(500).send("server error");
+    }
+});
+
+app.delete("/cart", async (req,res) =>{
+    try {
+        
+
+        const deleteCart = await Cart.destroy({
+            where : {},
+            truncate : true
+        });
+
+        res.json("berhasil di hapus")
+    } catch (err) {
+        console.error(err.massage);
+        res.status(500).send("server error");
+    }
+});
+
+//Profile Page
+
+app.post("/profile", async (req,res) => {
+    try {
+        const { userName, contact, alamat,metode,bank, jumlahProduk, totalHarga } = req.body;
+        const newProfile = new Profile({
+            userName, 
+            contact, 
+            alamat,
+            metode,
+            bank, 
+            jumlahProduk, 
+            totalHarga
+        });
+
+        await newProfile.save();
+
+        res.json(newProfile);
+
+    } catch (err) {
+        console.error(err.massage);
+        res.status(500).send("server error");
+    }
+});
+
+app.get("/profile", async (req, res)=>{
+    try {
+        const getAllProfile = await Profile.findAll({})
+
+        res.json(getAllProfile)
+    } catch (err) {
+        console.error(err.massage);
+        res.status(500).send("server error");
+    }
+})
+
+
 
 
 app.listen(8000, ()=> console.log("port berjalan di 8000"));
